@@ -1,5 +1,6 @@
 import os
 import shutil
+import time
 
 downloads_dir = os.path.join(os.path.expanduser("~"), "Downloads")
 
@@ -45,5 +46,28 @@ def move_files(extension_folders, downloads_dir, files):
             dst = os.path.join(downloads_dir, folder_name, file_name)
             shutil.move(src, dst)
 
-create_folders(extension_folders, downloads_dir, files)
-move_files(extension_folders, downloads_dir, files)
+def get_files_in_directory(directory):
+    return os.listdir(directory)
+
+def check_files_added(previous_files, current_files):
+    added_files = [file for file in current_files if file not in previous_files]
+    return added_files
+
+def main():
+    create_folders(extension_folders, downloads_dir, files)
+    move_files(extension_folders, downloads_dir, files)
+    previous_files = get_files_in_directory(downloads_dir)
+
+    while True:
+        current_files = get_files_in_directory(downloads_dir)
+        added_files = check_files_added(previous_files, current_files)
+    
+        if added_files:
+            create_folders(extension_folders, downloads_dir, added_files)
+            move_files(extension_folders, downloads_dir, added_files)    
+        previous_files = current_files
+        time.sleep(30)  
+
+
+if __name__ == "__main__":
+    main() 
